@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
 #include "ObiektGeom.hh"
+#define PI 3.14159265
 
 using namespace std;
 
@@ -8,9 +10,9 @@ ObiektGeom::ObiektGeom(const char *sNazwaPliku_BrylaWzorcowa,
                        const char *sNazwaObiektu,
                        int KolorID,
                        Wektor3D Skala,
-                       Wektor3D Polozenie
-                      // ,Macierz3D MacierzRotacji
-                       ) : _NazwaPliku_BrylaWzorcowa(sNazwaPliku_BrylaWzorcowa), _KolorID(KolorID), _Skala(Skala), _Polozenie(Polozenie)/*, _MacierzRotacji(MacierzRotacji) */
+                       Wektor3D Polozenie,
+                       Macierz3D MacierzRotacji
+                       )  : _NazwaPliku_BrylaWzorcowa(sNazwaPliku_BrylaWzorcowa), _KolorID(KolorID), _Skala(Skala), _Polozenie(Polozenie), _MacierzRotacji(MacierzRotacji)
 {
   _NazwaObiektu = sNazwaObiektu;
   _NazwaPliku_BrylaRysowana = NAZWA_KARTOTEKI_PLIKOW_DO_RYSOWANIA;
@@ -19,12 +21,13 @@ ObiektGeom::ObiektGeom(const char *sNazwaPliku_BrylaWzorcowa,
   _NazwaPliku_BrylaRysowana += ".dat";
 }
 
+
 void ObiektGeom::Przelicz_i_Zapisz_Wierzcholkii(std::istream &StrumienWej, std::ostream &StrumienWyj)
 {
-  double WspX, WspY, WspZ;
+  Wektor3D Wek_Wspolrzed;
   int Indeks_Wiersza;
-
-  StrumienWej >> WspX >> WspY >> WspZ;
+  
+  StrumienWej >> Wek_Wspolrzed[0] >> Wek_Wspolrzed[1] >> Wek_Wspolrzed[2];
   if (StrumienWej.fail())
   {
     cout << "Blad wczytania wspolrzednych" << endl;
@@ -33,10 +36,9 @@ void ObiektGeom::Przelicz_i_Zapisz_Wierzcholkii(std::istream &StrumienWej, std::
   Indeks_Wiersza = 0;
   do
   {
-    WspX = WspX * this->_Skala[0] + this->_Polozenie[0];
-    WspY = WspY * this->_Skala[1] + this->_Polozenie[1];
-    WspZ = WspZ * this->_Skala[2] + this->_Polozenie[2];
-    StrumienWyj <<WspX<<" "<<WspY<<" "<<WspZ<< endl;
+    Wek_Wspolrzed=(this->_MacierzRotacji*(Wek_Wspolrzed^this->_Skala))+this->_Polozenie;
+
+    StrumienWyj << Wek_Wspolrzed[0] << " " << Wek_Wspolrzed[1] << " " << Wek_Wspolrzed[2] << endl;
     Indeks_Wiersza++;
 
     if (Indeks_Wiersza == 4)
@@ -45,12 +47,10 @@ void ObiektGeom::Przelicz_i_Zapisz_Wierzcholkii(std::istream &StrumienWej, std::
       Indeks_Wiersza = 0;
     }
 
-    StrumienWej >> WspX >> WspY >> WspZ;
+    StrumienWej >> Wek_Wspolrzed[0] >> Wek_Wspolrzed[1] >> Wek_Wspolrzed[2];
 
   } while (!(StrumienWej.eof()));
 }
-
-
 
 void ObiektGeom::Przelicz_i_Zapisz_Wierzcholki()
 {
@@ -68,35 +68,4 @@ void ObiektGeom::Przelicz_i_Zapisz_Wierzcholki()
   }
   Przelicz_i_Zapisz_Wierzcholkii(StrmWe, StrmWy);
 
- /* 
-  double  WspX, WspY, WspZ;
-  int Indeks_Wiersza = 0;
-
-  StrmWe >> WspX >> WspY >> WspZ;
-
-  if (StrmWe.fail())return false;
-
-  do {
-    WspX = WspX*this->_Skala[0]+this->_Polozenie[0];
-    WspY = WspY*this->_Skala[1]+this->_Polozenie[1];
-    WspZ = WspZ*this->_Skala[2]+this->_Polozenie[2];
-    StrmWy << WspX << " " << WspY << " " << WspZ << endl;
-    ++Indeks_Wiersza;
-
-    if (Indeks_Wiersza >= 4) {
-      StrmWy << endl;
-      Indeks_Wiersza = 0;
-    }
-
-    StrmWe >> WspX >> WspY >> WspZ;
-
-  } while (!StrmWe.fail());
-
-  if (!StrmWe.eof()) return false;
-
-
-  
-  return  !StrmWy.fail();
-
-  */
 }

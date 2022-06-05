@@ -16,15 +16,18 @@ private:
 public:
   Wektor();
   ~Wektor();
-  Wektor(Wektor<STyp, SRozmiar> &Wek); 
+  Wektor(const Wektor<STyp, SRozmiar> &Wek); 
   Wektor(STyp l1, STyp l2, STyp l3);
   STyp operator[](int liczba) const { return ZmiennaWektor[liczba]; }
   STyp &operator[](int liczba) { return ZmiennaWektor[liczba]; }
   STyp operator*(const Wektor<STyp, SRozmiar> &Wek2);
+  Wektor<STyp, SRozmiar> operator^(const Wektor<STyp, SRozmiar> &Wektor);
   Wektor<STyp, SRozmiar> operator-(const Wektor<STyp, SRozmiar> &Wek2);
   Wektor<STyp, SRozmiar> operator+(const Wektor<STyp, SRozmiar> &Wek2);
   Wektor<STyp, SRozmiar> operator*(const double &liczba);
   Wektor<STyp, SRozmiar> operator/(const double &liczba);
+  Wektor<STyp, SRozmiar> operator=(const Wektor<STyp,SRozmiar> &Wek);
+  bool operator!=(const Wektor <STyp,SRozmiar> &Wek);
   static int WyswietlAktualna() {return AktualnaIloscObiektow;}
   static int WyswietlCalkowita() {return CalkowitaIloscObiektow;}
 };
@@ -35,14 +38,15 @@ int Wektor<STyp,SRozmiar>::AktualnaIloscObiektow = 0;
 template <typename STyp,int SRozmiar>
 int Wektor<STyp,SRozmiar>::CalkowitaIloscObiektow = 0;
 
-template<typename STyp,int SRozmiar>
-Wektor<STyp,SRozmiar>::Wektor(Wektor<STyp,SRozmiar> &Wek)
+template <typename STyp,int SRozmiar>
+Wektor<STyp,SRozmiar>::Wektor(const  Wektor<STyp,SRozmiar> &Wek)
 {
     for(int i=0;i<SRozmiar;i++)
     {
     this->ZmiennaWektor[i]=Wek.ZmiennaWektor[i];
     }
-    cout<<"Kopiuje"<<endl;
+    ++AktualnaIloscObiektow;
+    ++CalkowitaIloscObiektow;
 }
 
 
@@ -53,7 +57,6 @@ Wektor<STyp,SRozmiar>::Wektor()
    {
       this->ZmiennaWektor[i]=0;
    }
-  // cout << "Konstruktor bezparametryczny" << endl;
    ++AktualnaIloscObiektow;
    ++CalkowitaIloscObiektow;
 }
@@ -62,7 +65,6 @@ Wektor<STyp,SRozmiar>::Wektor()
 template <typename STyp, int SRozmiar>
 Wektor<STyp,SRozmiar>::~Wektor()
 {
-  //  cout << "DO WIDZENIA" << endl;
     --AktualnaIloscObiektow;
 }
 
@@ -75,16 +77,41 @@ Wektor<STyp,SRozmiar>::Wektor(STyp l1, STyp l2, STyp l3)
     this->ZmiennaWektor[2] = l3;
     ++AktualnaIloscObiektow;
     ++CalkowitaIloscObiektow;
-  //  cout << "Konstruktor parametryczny" << endl;
+}
+
+
+template <typename STyp,int SRozmiar>
+STyp Wektor<STyp,SRozmiar>::operator*(const Wektor<STyp,SRozmiar> &Wekt2)
+{
+    STyp wynik;
+    wynik=0;
+    for (int i = 0; i < SRozmiar; i++)
+    {
+        wynik = wynik+this->ZmiennaWektor[i] * Wekt2[i];
+    }
+    return wynik;
 }
 
 template <typename STyp,int SRozmiar>
-STyp Wektor<STyp,SRozmiar>::operator*(const Wektor<STyp,SRozmiar> &Wek2)
+bool Wektor<STyp,SRozmiar>::operator!=(const Wektor<STyp,SRozmiar> &Wek)
 {
-    STyp wynik;
-    for (int i = 0; i < SRozmiar; i++)
+    for(int i=0;i<SRozmiar;i++)
     {
-        wynik += this->ZmiennaWektor[i] * Wek2[i];
+        if(this->ZmiennaWektor[i]==Wek[i]);
+        else
+        return false;
+    }
+    return true;
+}
+
+
+template <typename STyp, int SRozmiar>
+Wektor<STyp,SRozmiar> Wektor<STyp,SRozmiar>::operator^(const Wektor<STyp,SRozmiar> &Wektorr)
+{
+    Wektor<STyp,SRozmiar> wynik;
+    for(int i=0; i<SRozmiar;i++)
+    {
+        wynik[i]=this->ZmiennaWektor[i]*Wektorr[i];
     }
     return wynik;
 }
@@ -150,5 +177,18 @@ ostream &operator<<(ostream &Strm, const Wektor<STyp, SRozmiar> &Wek)
     }
     return Strm << endl;
 }
+
+
+template <typename STyp, int SRozmiar>
+Wektor<STyp,SRozmiar> Wektor<STyp,SRozmiar>::operator=(const Wektor<STyp,SRozmiar> &Wek)
+{
+    for(int i=0;i<SRozmiar;i++)
+    {
+        this->ZmiennaWektor[i]=Wek.ZmiennaWektor[i];
+    }
+    return (*this);
+}
+
+
 
 #endif
