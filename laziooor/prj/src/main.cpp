@@ -17,6 +17,8 @@ using namespace std;
  *  Następnie w tle uruchamiany jest program gnuplot.
  *  \param[in] rLacze - nieaktywne łącze do gnuplota.
  */
+
+/*
 void Inicjalizuj_Lacze(PzG::LaczeDoGNUPlota &rLacze)
 {
   rLacze.ZmienTrybRys(PzG::TR_3D);
@@ -35,10 +37,104 @@ void DodajDoListyRysowania(PzG::LaczeDoGNUPlota &rLacze, const ObiektGeom &rOb)
   wInfoPliku = &rLacze.DodajNazwePliku(rOb.WezNazwePliku_BrylaRysowana());
   wInfoPliku->ZmienKolor(rOb.WezKolorID());
 }
+*/
 
+void WyswietlMenu()
+{
+  std::cout << "j - jazda na wprost" << endl;
+  std::cout << "o - zmien orientacje" << endl;
+  std::cout << "w - wybor lazika" << endl;
+  std::cout << "m - wyswietl menu" << endl
+            << endl;
+  std::cout << "k - koniec dialania programu" << endl;
+}
 int main()
 {
   {
+    enum wybory
+    {
+      j = 1,
+      o = 2,
+      w = 3,
+      m = 4,
+      k = 5
+    };
+    char wybor;
+    double Odleglosc_DO_Przeje, szybkosc, KatObrotu;
+    Scena Scena;
+    Scena.Rysuj();
+    Scena.setAktywny()->WpiszKat() = 0;
+
+
+
+    std::cout<<std::endl<<std::endl<<std::endl<<std::endl;
+    std::cout << std::endl
+              << "AKTYWNY LAZIK" << std::endl
+              << "Nazwa:   " << Scena.getAktywny()->WezNazweObiektu()
+              << std::endl;
+
+    std::cout << "Polozenie (x,y,z):" << Scena.getAktywny()->WezPolozenie();
+    std::cout << "Orientacja [st]:   " << Scena.getAktywny()->WezKat() << std::endl;
+    std::cout << endl
+              << endl
+              << "Aktualna ilosc obiektow: " << Wektor3D::WyswietlAktualna() << endl;
+    std::cout << "Calkowita ilosc obiektow: " << Wektor3D::WyswietlCalkowita() << endl
+              << endl;
+
+    WyswietlMenu();
+    do
+    {
+      std::cout<<"Twoj wybor< m - menu >: ";
+      std::cin >>wybor;
+      std::cout<<std::endl<<std::endl;
+
+      switch (wybor)
+      {
+      case ('j'):
+        std::cout << "Podaj odleglosc do przejechania: ";
+        std::cin >> Odleglosc_DO_Przeje;
+        std::cout << "Podaj szybkosc: ";
+        std::cin >> szybkosc;
+        Scena.setAktywny()->Jedz(Odleglosc_DO_Przeje, szybkosc, Scena.WezLacze());
+        break;
+      case ('o'):
+        std::cout << "Podaj kat do obrotu: ";
+        std::cin >> KatObrotu;
+        Scena.setAktywny()->Obroc(KatObrotu,Scena.WezLacze());
+         break;
+      case ('w'):
+        Scena.WyborLazika();
+        break;
+      case ('m'):
+        WyswietlMenu();
+        break;
+      case ('k'):
+        return 0;
+        break;
+
+      default:
+        break;
+      }
+      if(wybor!='m')
+      {
+        std::cout << std::endl
+                << "AKTYWNY LAZIK" << std::endl
+                << "Nazwa:   " << Scena.getAktywny()->WezNazweObiektu()
+                << std::endl;
+
+      std::cout << "Polozenie (x,y,z):" << Scena.getAktywny()->WezPolozenie();
+      std::cout << "Orientacja [st]:   " << Scena.getAktywny()->WezKat() << std::endl;
+      std::cout << endl
+                << endl
+                << "Aktualna ilosc obiektow: " << Wektor3D::WyswietlAktualna() << endl;
+      std::cout << "Calkowita ilosc obiektow: " << Wektor3D::WyswietlCalkowita() << endl
+                << endl;
+      }
+      
+
+    } while (wybor != k);
+
+    /*
     Wektor3D w1(1,0,0),w2(0,1,0),w3(0,0,1);
     Wektor3D Skala(20, 20, 10);
     Wektor3D Polozenie1(0, 0, 0);
@@ -47,20 +143,19 @@ int main()
     Macierz3D MacRotacji;
     MacRotacji(0)=w1;
     MacRotacji(1)=w2;
-    MacRotacji(2)=w3;   
+    MacRotacji(2)=w3;
     double Odleglosc_DO_Przeje, szybkosc, KatObrotu;
-    Scena Scena1;
 
-    
+
+
     PzG::LaczeDoGNUPlota Lacze;
 
     Inicjalizuj_Lacze(Lacze);
     if (!Inicjalizuj_PowierzchnieMarsa(Lacze))
       return 1;
 
-    
-    
-    
+
+
 
     //Lazik FSR("bryly_wzorcowe/szescian3.dat", "FSR", Kolor_JasnoNiebieski, Skala, Polozenie1);
     //Lazik Perseverance("bryly_wzorcowe/szescian3.dat", "Perseverance", Kolor_Czerwony, Skala, Polozenie2);
@@ -78,12 +173,15 @@ int main()
     Ob2.Przelicz_i_Zapisz_Wierzcholki();
     Ob3.Przelicz_i_Zapisz_Wierzcholki();
 
+
+
+
     Ob1.WpiszKat()=0;
     cout << endl
          << "Start programu gnuplot" << endl
          << endl;
     Lacze.Rysuj();
-  
+
     cout << "Podaj kat obrotu: ";
     cin >> KatObrotu;
 
@@ -113,22 +211,7 @@ int main()
     Ob1.Jedz(Odleglosc_DO_Przeje, szybkosc, Lacze);
 
     //cin.ignore(100, '\n');
-  /*
 
-    Ob1.Przelicz_i_Zapisz_Wierzcholki();
-    Lacze.Rysuj();
-
-    cout << "Nacisnij klawisz ENTER, aby FSR wykonal przesuniecie." << endl;
-    cin.ignore(100, '\n');
-
-    Ob1.Przelicz_i_Zapisz_Wierzcholki();
-    Lacze.Rysuj();
-
-    cout << "Nacisnij klawisz ENTER, aby zakonczyc." << endl;
-    cin.ignore(100, '\n');
-    */
-   
+   */
   }
-  cout << endl << endl << "Aktualna ilosc obiektow: " << Wektor3D::WyswietlAktualna() << endl;
-  cout << "Calkowita ilosc obiektow: " << Wektor3D::WyswietlCalkowita() << endl;
 }
